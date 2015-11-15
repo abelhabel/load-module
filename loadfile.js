@@ -7,7 +7,7 @@ function getScript(fileName) {
     // code for older browsers
     ajax = new ActiveXObject("Microsoft.XMLHTTP");
   }
-  xmlhttp.onreadystatechange = function(res) {
+  ajax.onreadystatechange = function(res) {
     if (ajax.readyState == 4 && ajax.status == 200) {
       loadModule(ajax.responseText, fileName);
     }
@@ -33,17 +33,20 @@ function loadModule(script, name){
       "this.getDep = function(){" +
         "var keys = {};" +
         "for(var key in dep) {" +
+          "mod[key] = modules[key];" +
           "keys[key] = modules[key];" +
         "}" +
         "return keys;" +
       "};" +
       "var require=function(str){" +
-        "loadXMLDoc(str);" +
+        "getScript(str);" +
         "dep[str] = str;" +
         "return dep[str];" +
       "};" +
       "var module = {};" + 
       script + 
+      "var mod = module.exports;" +
+      "module.exports.dep = dep;"+
       'module.exports.getDep = getDep;' +
       "return module.exports;"+
     "})(" + "modules['"+ name + "']" + ");");
